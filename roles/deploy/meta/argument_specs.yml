@@ -72,6 +72,14 @@ argument_specs:
             description: >-
               Path to an EnvironmentFile for this container. Falls back to
               elise_quadlet_env_file_path when not set.
+          env:
+            type: dict
+            required: false
+            description: >-
+              Dict of key/value pairs rendered as inline Environment= directives
+              in the [Container] section. Use for per-container non-secret env
+              vars that differ across containers (e.g. POSTGRESQL_USER). Secrets
+              should use EnvironmentFile instead.
           exec:
             type: str
             required: false
