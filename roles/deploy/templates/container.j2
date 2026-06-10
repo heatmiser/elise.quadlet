@@ -32,6 +32,9 @@ PublishPort={{ port }}
 {% if _env_file | length > 0 %}
 EnvironmentFile={{ _env_file }}
 {% endif %}
+{% for key, value in (item.env | default({})).items() %}
+Environment={{ key }}={{ value }}
+{% endfor %}
 {% if item.health is defined %}
 HealthCmd={{ item.health.cmd }}
 HealthInterval={{ item.health.interval | default('30s') }}

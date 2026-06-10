@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.1.1 — 2026-06-10
+
+### Added
+
+- `deploy` role `container.j2`: `env:` dict support for inline `Environment=` Quadlet
+  directives. Use for per-container non-secret env vars that differ across containers
+  (e.g. `POSTGRESQL_USER`). Secrets should continue to use `EnvironmentFile`.
+- `deploy` role `argument_specs.yml`: documented `env` field on container entries.
+
 ## v0.1.0 — 2026-06-10
 
 ### Added
