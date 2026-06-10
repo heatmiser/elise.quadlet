@@ -1,0 +1,20 @@
+---
+# Registry login — skipped when elise_quadlet_registry is not set
+- name: Sub |Login to container registry
+  containers.podman.podman_login:
+    registry: "{{ elise_quadlet_registry }}"
+    username: "{{ elise_quadlet_registry_username }}"
+    password: "{{ elise_quadlet_registry_password }}"
+  when: elise_quadlet_registry | length > 0
+  no_log: true
+
+# Pull each image in the containers list to local storage
+- name: Sub |Pull container image
+  containers.podman.podman_image:
+    name: "{{ item.image }}"
+    pull: true
+    state: present
+  loop: "{{ elise_quadlet_containers }}"
+  loop_control:
+    label: "{{ item.name }}: {{ item.image }}"
+...

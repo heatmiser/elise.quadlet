@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: heatmiser
+  description: >-
+    Yield a Quadlet service stack — disable and stop all containers while
+    preserving all Quadlet unit files, volumes, and configuration.
+    State is always preserved; teardown is explicitly rejected.
+  license: Apache-2.0
+  min_ansible_version: "2.16"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+  galaxy_tags:
+    - podman
+    - quadlet
+    - containers
+    - systemd
+
+dependencies: []
+...

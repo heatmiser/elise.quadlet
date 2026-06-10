@@ -1,0 +1,19 @@
+---
+# Build a sorted deduplicated list of tier integers from the containers list
+- name: Collect unique start_order tiers from containers list
+  ansible.builtin.set_fact:
+    __elise_quadlet_tiers: >-
+      {{ elise_quadlet_containers
+         | map(attribute='start_order')
+         | list
+         | unique
+         | sort }}
+
+# Start each tier in order, health-gating before advancing to the next
+- name: Sub | Start tier {{ __elise_quadlet_tier }}
+  ansible.builtin.include_tasks: start_tier.yml
+  loop: "{{ __elise_quadlet_tiers }}"
+  loop_control:
+    loop_var: __elise_quadlet_tier
+    label: "tier {{ __elise_quadlet_tier }}"
+...

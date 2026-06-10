@@ -1,0 +1,260 @@
+---
+argument_specs:
+  main:
+    short_description: Deploy Podman Quadlet units from a containers list data model
+    description:
+      - Renders Quadlet unit files (container, pod, network, volume) and an EnvironmentFile.
+      - In pull mode, also installs prerequisites and pulls images from a registry.
+      - In embedded mode, skips prerequisites and image pulls — images are pre-staged
+        by dcm-image-load.service before this role runs.
+    options:
+      elise_quadlet_service_mode:
+        type: str
+        required: false
+        default: pull
+        choices:
+          - pull
+          - embedded
+        description:
+          - Deployment mode.
+          - "pull: images pulled from registry at deploy time."
+          - "embedded: images pre-staged via physically-bound bootc pattern."
+      elise_quadlet_quadlet_dir:
+        type: str
+        required: false
+        default: /etc/containers/systemd
+        description: Filesystem path where Quadlet unit files are written.
+      elise_quadlet_containers:
+        type: list
+        required: true
+        description:
+          - List of container dicts. Each entry produces one .container unit file.
+          - Each dict must contain at minimum name, image, and start_order.
+        elements: dict
+        options:
+          name:
+            type: str
+            required: true
+            description: Container name. Used as the unit filename and ContainerName=.
+          image:
+            type: str
+            required: true
+            description: Full image reference including registry and tag.
+          start_order:
+            type: int
+            required: true
+            description: Startup tier. Lower numbers start first. Containers in the same tier start together.
+          description:
+            type: str
+            required: false
+            description: Human-readable description for the systemd [Unit] section.
+          pod:
+            type: str
+            required: false
+            description: Pod name. When set, renders Pod= and adjusts After=/Requires= in the unit.
+          network:
+            type: str
+            required: false
+            description: Network name (without .network suffix). Renders Network= in [Container].
+          volumes:
+            type: list
+            required: false
+            elements: str
+            description: List of volume mount strings in "src:dst[:opts]" format.
+          publish:
+            type: list
+            required: false
+            elements: str
+            description: List of port publish strings in "host:container" format. Used on pod units.
+          env_file:
+            type: str
+            required: false
+            description: >-
+              Path to an EnvironmentFile for this container. Falls back to
+              elise_quadlet_env_file_path when not set.
+          exec:
+            type: str
+            required: false
+            description: >-
+              Command override (Exec= in [Container]). Use when the container runs
+              a specific subcommand rather than its default entrypoint.
+          user:
+            type: str
+            required: false
+            description: User= in [Container]. Overrides the image default user.
+          podman_args:
+            type: list
+            required: false
+            elements: str
+            description: >-
+              List of raw PodmanArgs= lines. Use for options not natively
+              supported by the Quadlet format (e.g. --cpus=2).
+          health:
+            type: dict
+            required: false
+            description: >-
+              Health check configuration. When present, renders HealthCmd=,
+              HealthInterval=, HealthRetries=, HealthTimeout= in the unit file.
+              Also used by the start role for health-gated tier startup.
+            options:
+              cmd:
+                type: str
+                required: true
+                description: Health check command string passed to HealthCmd=.
+              interval:
+                type: str
+                required: false
+                default: 30s
+                description: Time between health checks (HealthInterval=).
+              retries:
+                type: int
+                required: false
+                default: 3
+                description: Number of consecutive failures before unhealthy (HealthRetries=).
+              timeout:
+                type: str
+                required: false
+                default: 30s
+                description: Time to wait for a health check to complete (HealthTimeout=).
+      elise_quadlet_pod:
+        type: dict
+        required: false
+        default: {}
+        description: >-
+          Pod definition dict. When non-empty, renders a .pod unit file.
+          Omit or leave empty when no pod grouping is needed.
+        options:
+          name:
+            type: str
+            required: true
+            description: Pod name. Used as the unit filename.
+          description:
+            type: str
+            required: false
+            description: Human-readable description for the [Unit] section.
+          network:
+            type: str
+            required: false
+            description: Network name for the pod (without .network suffix).
+          publish:
+            type: list
+            required: false
+            elements: str
+            description: List of port publish strings in "host:container" format.
+      elise_quadlet_network:
+        type: dict
+        required: false
+        default: {}
+        description: Network definition dict. When non-empty, renders a .network unit file.
+        options:
+          name:
+            type: str
+            required: true
+            description: Network name. Used as the unit filename.
+          description:
+            type: str
+            required: false
+            description: Human-readable description for the [Unit] section.
+          driver:
+            type: str
+            required: false
+            default: bridge
+            description: Network driver (Driver= in [Network]).
+          internal:
+            type: bool
+            required: false
+            default: false
+            description: When true, sets Internal=true in [Network].
+          subnet:
+            type: str
+            required: false
+            description: Subnet CIDR (Subnet= in [Network]).
+          gateway:
+            type: str
+            required: false
+            description: Gateway address (Gateway= in [Network]).
+      elise_quadlet_volumes:
+        type: list
+        required: false
+        default: []
+        description: List of named volume dicts. Each entry produces one .volume unit file.
+        elements: dict
+        options:
+          name:
+            type: str
+            required: true
+            description: Volume name. Used as the unit filename.
+          description:
+            type: str
+            required: false
+            description: Human-readable description for the [Unit] section.
+          driver:
+            type: str
+            required: false
+            description: Volume driver (Driver= in [Volume]). Omitted when not set.
+          options:
+            type: str
+            required: false
+            description: Mount options string (Options= in [Volume]). Omitted when not set.
+      elise_quadlet_env_vars:
+        type: dict
+        required: false
+        default: {}
+        description: >-
+          Key=value dict written to the EnvironmentFile at elise_quadlet_env_file_path.
+          Rendered only when non-empty.
+      elise_quadlet_env_file_path:
+        type: str
+        required: false
+        default: ""
+        description: >-
+          Destination path for the rendered EnvironmentFile.
+          Required when elise_quadlet_env_vars is non-empty or any container
+          references this file via env_file.
+      elise_quadlet_required_packages:
+        type: list
+        required: false
+        default: []
+        elements: str
+        description: >-
+          System packages to install in pull mode via dnf. Ignored in embedded mode.
+      elise_quadlet_firewall_ports:
+        type: list
+        required: false
+        default: []
+        description: >-
+          Firewall port rules to open in pull mode. Ignored in embedded mode.
+          Each entry is passed directly to ansible.posix.firewalld.
+        elements: dict
+        options:
+          port:
+            type: str
+            required: false
+            description: Port/protocol string (e.g. "8443/tcp"). Mutually exclusive with service.
+          service:
+            type: str
+            required: false
+            description: Firewalld service name. Mutually exclusive with port.
+          zone:
+            type: str
+            required: false
+            default: public
+            description: Firewalld zone.
+      elise_quadlet_registry:
+        type: str
+        required: false
+        default: ""
+        description: >-
+          Registry hostname for podman login in pull mode. Leave empty to skip login.
+      elise_quadlet_registry_username:
+        type: str
+        required: false
+        default: ""
+        description: Registry username. Required when elise_quadlet_registry is set.
+      elise_quadlet_registry_password:
+        type: str
+        required: false
+        default: ""
+        description: Registry password. Required when elise_quadlet_registry is set.
+        no_log: true
+...

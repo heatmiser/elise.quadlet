@@ -1,0 +1,27 @@
+---
+namespace: elise
+name: quadlet
+version: 0.1.0
+readme: README.md
+authors:
+  - heatmiser
+description: >-
+  Generic Podman Quadlet deployment collection — operation-named roles
+  driven by a containers list data model. No service names exist inside
+  the collection. Config-as-code repos supply service-specific vars and
+  local tasks; the collection handles Quadlet unit rendering and lifecycle.
+license:
+  - Apache-2.0
+tags:
+  - podman
+  - quadlet
+  - containers
+  - systemd
+  - infrastructure
+  - imagemode
+  - bootc
+repository: https://github.com/heatmiser/elise.quadlet
+documentation: https://github.com/heatmiser/elise.quadlet
+issues: https://github.com/heatmiser/elise.quadlet/issues
+dependencies: {}
+...

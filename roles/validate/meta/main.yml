@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  author: heatmiser
+  description: >-
+    Validate a Quadlet service stack. In pull mode, asserts all containers
+    are running via podman ps. In embedded mode, emits a debug notice —
+    post-boot validation is deferred to the dcm-validate.service pattern.
+  license: Apache-2.0
+  min_ansible_version: "2.16"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+  galaxy_tags:
+    - podman
+    - quadlet
+    - containers
+    - systemd
+
+dependencies: []
+...

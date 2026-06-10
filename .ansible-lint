@@ -1,0 +1,13 @@
+---
+profile: production
+exclude_paths:
+  - .github/
+warn_list:
+  - experimental
+# var-naming[no-role-prefix] is skipped because elise_quadlet_* is an intentional
+# collection-level namespace shared across all roles. The rule assumes a single-role
+# context; collection roles sharing a common variable namespace is the CoP-recommended
+# pattern for cross-role variable reuse in collections.
+skip_list:
+  - var-naming[no-role-prefix]
+...

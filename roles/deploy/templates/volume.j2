@@ -1,0 +1,13 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description={{ item.description | default(item.name + ' volume') }}
+{% if item.driver is defined or item.options is defined %}
+
+[Volume]
+{% if item.driver is defined %}
+Driver={{ item.driver }}
+{% endif %}
+{% if item.options is defined %}
+Options={{ item.options }}
+{% endif %}
+{% endif %}

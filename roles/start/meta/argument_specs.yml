@@ -1,0 +1,30 @@
+---
+argument_specs:
+  main:
+    short_description: Start Quadlet services in health-gated tiers
+    description:
+      - Groups containers by start_order tier, starts each tier, then waits
+        for all health checks in that tier to pass before advancing.
+      - Pull mode only. In embedded mode, systemd manages startup ordering
+        via Quadlet unit After= and Requires= directives.
+    options:
+      elise_quadlet_containers:
+        type: list
+        required: true
+        description: >-
+          The same containers list passed to the deploy role.
+          start_order and health fields drive tier grouping and health gates.
+        elements: dict
+      elise_quadlet_health_check_retries:
+        type: int
+        required: false
+        default: 30
+        description: >-
+          Maximum number of health check poll attempts per container before
+          the role fails. Each attempt is separated by elise_quadlet_health_check_delay.
+      elise_quadlet_health_check_delay:
+        type: int
+        required: false
+        default: 5
+        description: Seconds to wait between health check poll attempts.
+...

@@ -1,0 +1,34 @@
+---
+# Install system packages required by the service stack
+- name: Sub |Ensure required packages are installed
+  ansible.builtin.dnf:
+    name: "{{ elise_quadlet_required_packages }}"
+    state: present
+  when: elise_quadlet_required_packages | length > 0
+
+# Ensure firewalld is running before opening ports
+- name: Sub |Ensure firewalld is enabled and started
+  ansible.builtin.systemd_service:
+    name: firewalld
+    enabled: true
+    state: started
+
+# Open firewall ports — immediate + permanent so rules survive reboot
+- name: Sub |Open firewall ports
+  ansible.posix.firewalld:
+    port: "{{ item.port | default(omit) }}"
+    service: "{{ item.service | default(omit) }}"
+    zone: "{{ item.zone | default('public') }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop: "{{ elise_quadlet_firewall_ports }}"
+  when: elise_quadlet_firewall_ports | length > 0
+
+# Quadlet dir must exist before unit files are written
+- name: Sub |Ensure Quadlet unit directory exists
+  ansible.builtin.file:
+    path: "{{ elise_quadlet_quadlet_dir }}"
+    state: directory
+    mode: "0755"
+...

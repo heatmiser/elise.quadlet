@@ -1,0 +1,16 @@
+---
+argument_specs:
+  main:
+    short_description: Yield (disable and stop) a Quadlet service stack
+    description:
+      - Disables and stops all containers in the stack.
+      - Quadlet unit files, named volumes, and all configuration are preserved.
+      - The reclaim role restores the stack from this preserved state.
+      - "State machine: active -> yielded"
+    options:
+      elise_quadlet_containers:
+        type: list
+        required: true
+        description: The same containers list passed to the deploy role.
+        elements: dict
+...

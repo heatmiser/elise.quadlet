@@ -1,0 +1,23 @@
+---
+argument_specs:
+  main:
+    short_description: Validate a deployed Quadlet service stack
+    description:
+      - Pull mode — checks that all containers appear in podman ps output and asserts each is running.
+      - Embedded mode — emits a notice; inline validation is not possible during first-boot rendering.
+        Post-boot validation should be handled by a dcm-validate.service oneshot.
+    options:
+      elise_quadlet_service_mode:
+        type: str
+        required: false
+        default: pull
+        choices:
+          - pull
+          - embedded
+        description: Deployment mode. Determines whether inline or deferred validation is performed.
+      elise_quadlet_containers:
+        type: list
+        required: true
+        description: The same containers list passed to the deploy role.
+        elements: dict
+...

@@ -1,0 +1,15 @@
+---
+argument_specs:
+  main:
+    short_description: Reclaim a previously yielded Quadlet service stack
+    description:
+      - Re-enables and starts all containers from the preserved state left by the yield role.
+      - Does not re-render Quadlet unit files or re-configure the service.
+      - "State machine: yielded -> active"
+    options:
+      elise_quadlet_containers:
+        type: list
+        required: true
+        description: The same containers list passed to the deploy role.
+        elements: dict
+...

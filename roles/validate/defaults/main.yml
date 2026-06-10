@@ -1,0 +1,4 @@
+---
+# Deployment mode — must match what was passed to the deploy role
+elise_quadlet_service_mode: pull
+...

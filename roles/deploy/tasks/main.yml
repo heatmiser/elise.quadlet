@@ -1,0 +1,15 @@
+---
+# Pull mode: install packages, open firewall ports, ensure quadlet dir exists
+- name: Sub |Ensure prerequisites
+  ansible.builtin.include_tasks: prerequisites.yml
+  when: elise_quadlet_service_mode == 'pull'
+
+# Pull mode: registry login and image pulls
+- name: Sub |Pull container images
+  ansible.builtin.include_tasks: pull_images.yml
+  when: elise_quadlet_service_mode == 'pull'
+
+# Both modes: render Quadlet unit files and EnvironmentFile
+- name: Sub |Configure Quadlet units
+  ansible.builtin.include_tasks: configure.yml
+...

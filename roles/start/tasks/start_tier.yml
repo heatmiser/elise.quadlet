@@ -1,0 +1,36 @@
+---
+# Filter containers belonging to the current tier
+- name: Sub | Collect containers for tier {{ __elise_quadlet_tier }}
+  ansible.builtin.set_fact:
+    __elise_quadlet_tier_containers: >-
+      {{ elise_quadlet_containers
+         | selectattr('start_order', 'equalto', __elise_quadlet_tier)
+         | list }}
+
+# Enable and start all containers in this tier simultaneously
+- name: Sub | Enable and start Quadlet tier services - {{ __elise_quadlet_tier }}
+  ansible.builtin.systemd_service:
+    name: "{{ item.name }}.service"
+    state: started
+    enabled: true
+    daemon_reload: false
+  loop: "{{ __elise_quadlet_tier_containers }}"
+  loop_control:
+    label: "{{ item.name }}.service"
+
+# Wait for each container in this tier that has a health check defined.
+# Uses `podman healthcheck run` — relies on HealthCmd= set in the Quadlet unit
+# by the deploy role. Containers without a health dict are not gated.
+- name: Sub | Wait for Quadlet tier health checks - {{ __elise_quadlet_tier }}
+  ansible.builtin.command:
+    cmd: "podman healthcheck run {{ item.name }}"
+  register: __elise_quadlet_health_result
+  retries: "{{ elise_quadlet_health_check_retries }}"
+  delay: "{{ elise_quadlet_health_check_delay }}"
+  until: __elise_quadlet_health_result.rc == 0
+  changed_when: false
+  # command is justified: no Ansible module exists for podman healthcheck run
+  loop: "{{ __elise_quadlet_tier_containers | selectattr('health', 'defined') | list }}"
+  loop_control:
+    label: "{{ item.name }} health check"
+...

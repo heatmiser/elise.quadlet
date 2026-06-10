@@ -1,0 +1,50 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description={{ item.description | default(item.name + ' container') }}
+After=network-online.target{% if item.network is defined %} {{ item.network }}-network.service{% endif %}{% if item.pod is defined %} {{ item.pod }}-pod.service{% endif %}
+
+Wants=network-online.target{% if item.pod is defined %}
+Requires={{ item.pod }}-pod.service{% endif %}{% if item.network is defined and item.pod is not defined %}
+Requires={{ item.network }}-network.service{% endif %}
+
+[Container]
+Image={{ item.image }}
+ContainerName={{ item.name }}
+{% if item.pod is defined %}
+Pod={{ item.pod }}.pod
+{% endif %}
+{% if item.network is defined and item.pod is not defined %}
+Network={{ item.network }}.network
+{% endif %}
+{% if item.exec is defined %}
+Exec={{ item.exec }}
+{% endif %}
+{% if item.user is defined %}
+User={{ item.user }}
+{% endif %}
+{% for vol in item.volumes | default([]) %}
+Volume={{ vol }}
+{% endfor %}
+{% for port in item.publish | default([]) %}
+PublishPort={{ port }}
+{% endfor %}
+{% set _env_file = item.env_file | default(elise_quadlet_env_file_path) %}
+{% if _env_file | length > 0 %}
+EnvironmentFile={{ _env_file }}
+{% endif %}
+{% if item.health is defined %}
+HealthCmd={{ item.health.cmd }}
+HealthInterval={{ item.health.interval | default('30s') }}
+HealthRetries={{ item.health.retries | default(3) }}
+HealthTimeout={{ item.health.timeout | default('30s') }}
+{% endif %}
+{% for arg in item.podman_args | default([]) %}
+PodmanArgs={{ arg }}
+{% endfor %}
+
+[Service]
+Restart=always
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

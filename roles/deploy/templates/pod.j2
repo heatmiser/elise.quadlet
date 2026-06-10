@@ -1,0 +1,18 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description={{ elise_quadlet_pod.description | default(elise_quadlet_pod.name + ' pod') }}
+After=network-online.target{% if elise_quadlet_pod.network is defined %} {{ elise_quadlet_pod.network }}-network.service{% endif %}
+
+Wants=network-online.target{% if elise_quadlet_pod.network is defined %}
+Requires={{ elise_quadlet_pod.network }}-network.service{% endif %}
+
+[Pod]
+{% if elise_quadlet_pod.network is defined %}
+Network={{ elise_quadlet_pod.network }}.network
+{% endif %}
+{% for port in elise_quadlet_pod.publish | default([]) %}
+PublishPort={{ port }}
+{% endfor %}
+
+[Install]
+WantedBy=default.target

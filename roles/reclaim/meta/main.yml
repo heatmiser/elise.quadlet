@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author: heatmiser
+  description: >-
+    Reclaim a previously yielded Quadlet service stack — re-enable and start
+    all containers from preserved state. No re-deployment or re-configuration needed.
+  license: Apache-2.0
+  min_ansible_version: "2.16"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+  galaxy_tags:
+    - podman
+    - quadlet
+    - containers
+    - systemd
+
+dependencies: []
+...

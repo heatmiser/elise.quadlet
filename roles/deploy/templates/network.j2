@@ -1,0 +1,19 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description={{ elise_quadlet_network.description | default(elise_quadlet_network.name + ' network') }}
+After=network-online.target
+Wants=network-online.target
+
+[Network]
+NetworkName={{ elise_quadlet_network.name }}
+Driver={{ elise_quadlet_network.driver | default('bridge') }}
+Internal={{ elise_quadlet_network.internal | default(false) | string | capitalize }}
+{% if elise_quadlet_network.subnet is defined %}
+Subnet={{ elise_quadlet_network.subnet }}
+{% endif %}
+{% if elise_quadlet_network.gateway is defined %}
+Gateway={{ elise_quadlet_network.gateway }}
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target

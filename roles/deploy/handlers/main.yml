@@ -1,0 +1,9 @@
+---
+# Reload systemd to pick up newly written Quadlet unit files.
+# Only meaningful in pull mode — in embedded mode systemd daemon-reload
+# is handled by the first-boot service after the renderer exits.
+- name: Reload systemd daemon
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  when: elise_quadlet_service_mode == 'pull'
+...

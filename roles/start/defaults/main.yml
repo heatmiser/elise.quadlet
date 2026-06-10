@@ -1,0 +1,7 @@
+---
+# Maximum poll attempts per container health check before failing
+elise_quadlet_health_check_retries: 30
+
+# Seconds between health check poll attempts
+elise_quadlet_health_check_delay: 5
+...

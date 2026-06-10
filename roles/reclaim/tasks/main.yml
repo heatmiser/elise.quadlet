@@ -1,0 +1,12 @@
+---
+# Re-enable and start containers in start_order so dependencies come up before dependants.
+# Volumes and configuration are unchanged — state was preserved by the yield role.
+- name: Enable and start service
+  ansible.builtin.systemd_service:
+    name: "{{ item.name }}.service"
+    state: started
+    enabled: true
+  loop: "{{ elise_quadlet_containers | sort(attribute='start_order') }}"
+  loop_control:
+    label: "{{ item.name }}.service"
+...

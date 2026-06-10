@@ -1,0 +1,33 @@
+---
+- name: Validate pull mode deployment
+  when: elise_quadlet_service_mode == 'pull'
+  block:
+    # Capture all running container names in a single podman ps call
+    # command is justified: containers.podman has no module for listing running containers
+    - name: Sub |Collect running container names
+      ansible.builtin.command:
+        cmd: "podman ps --format {% raw %}{{.Names}}{% endraw %}"
+      register: __elise_quadlet_running_containers
+      changed_when: false
+
+    - name: Sub |Assert each container is running
+      ansible.builtin.assert:
+        that:
+          - item.name in __elise_quadlet_running_containers.stdout
+        fail_msg: "Container {{ item.name }} is not running"
+        success_msg: "Container {{ item.name }} is running"
+      loop: "{{ elise_quadlet_containers }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+# In embedded mode, systemd manages startup ordering after the first-boot renderer exits.
+# Inline validation is not possible here — the renderer runs before containers are started.
+# Post-boot validation should be implemented as a dcm-validate.service oneshot per service repo.
+- name: Embedded mode — deferred validation notice
+  ansible.builtin.debug:
+    msg: >-
+      Embedded mode: inline validation skipped. Implement a post-boot
+      dcm-validate.service oneshot in the service repo to validate this stack.
+    verbosity: 1
+  when: elise_quadlet_service_mode == 'embedded'
+...

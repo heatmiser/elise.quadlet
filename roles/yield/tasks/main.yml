@@ -1,0 +1,13 @@
+---
+# Disable and stop all containers in reverse start_order so dependants stop before dependencies.
+# Quadlet unit files, volumes, and configuration are intentionally NOT removed —
+# state is always preserved for reclaim.
+- name: Disable and stop service
+  ansible.builtin.systemd_service:
+    name: "{{ item.name }}.service"
+    state: stopped
+    enabled: false
+  loop: "{{ elise_quadlet_containers | sort(attribute='start_order', reverse=true) }}"
+  loop_control:
+    label: "{{ item.name }}.service"
+...
