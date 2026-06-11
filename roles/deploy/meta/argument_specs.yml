@@ -124,6 +124,20 @@ argument_specs:
                 required: false
                 default: 30s
                 description: Time to wait for a health check to complete (HealthTimeout=).
+          network_mode:
+            type: str
+            required: false
+            description: >-
+              Raw network mode string rendered as Network= in [Container].
+              Use for host networking (network_mode: host) or other non-bridge modes.
+              Takes precedence over the network field when both are set.
+          capabilities:
+            type: list
+            required: false
+            elements: str
+            description: >-
+              List of Linux capabilities to add (AddCapability= in [Container]).
+              Example: [NET_ADMIN, NET_RAW] for DHCP server functionality.
       elise_quadlet_pod:
         type: dict
         required: false

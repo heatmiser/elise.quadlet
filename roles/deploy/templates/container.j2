@@ -13,7 +13,9 @@ ContainerName={{ item.name }}
 {% if item.pod is defined %}
 Pod={{ item.pod }}.pod
 {% endif %}
-{% if item.network is defined and item.pod is not defined %}
+{% if item.network_mode is defined %}
+Network={{ item.network_mode }}
+{% elif item.network is defined and item.pod is not defined %}
 Network={{ item.network }}.network
 {% endif %}
 {% if item.exec is defined %}
@@ -43,6 +45,9 @@ HealthTimeout={{ item.health.timeout | default('30s') }}
 {% endif %}
 {% for arg in item.podman_args | default([]) %}
 PodmanArgs={{ arg }}
+{% endfor %}
+{% for cap in item.capabilities | default([]) %}
+AddCapability={{ cap }}
 {% endfor %}
 
 [Service]
