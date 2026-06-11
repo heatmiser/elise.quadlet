@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.1.2 — 2026-06-11
+
+### Added
+
+- `deploy` role `container.j2`: `network_mode` field for raw `Network=` values (e.g. `host`).
+  Takes precedence over `network` when both are set. Required for containers that need host
+  networking (e.g. DHCP servers receiving L2 broadcast traffic).
+- `deploy` role `container.j2`: `capabilities` list for `AddCapability=` directives.
+  Use for containers requiring elevated Linux capabilities (e.g. `NET_ADMIN`, `NET_RAW`
+  for DHCP server functionality).
+- `deploy` role `argument_specs.yml`: documented `network_mode` and `capabilities` fields
+  on container entries.
+
 ## v0.1.1 — 2026-06-10
 
 ### Added
