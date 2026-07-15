@@ -148,8 +148,8 @@ argument_specs:
         options:
           name:
             type: str
-            required: true
-            description: Pod name. Used as the unit filename.
+            required: false
+            description: Pod name. Used as the unit filename. Required when elise_quadlet_pod is non-empty.
           description:
             type: str
             required: false
@@ -171,8 +171,8 @@ argument_specs:
         options:
           name:
             type: str
-            required: true
-            description: Network name. Used as the unit filename.
+            required: false
+            description: Network name. Used as the unit filename. Required when elise_quadlet_network is non-empty.
           description:
             type: str
             required: false
